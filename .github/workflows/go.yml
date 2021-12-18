@@ -19,11 +19,7 @@ jobs:
         go-version: 1.17
 
     - name: Build
-      run: |
-        cd ./src/verifier
-        go build -v ./...
+      run: go build -v ./...
 
     - name: Test
-      run: |
-        cd ./src/verifier
-        go test -v ./...
+      run: go test -v ./...
