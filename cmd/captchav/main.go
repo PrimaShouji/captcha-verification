@@ -1,13 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strings"
-	"time"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog"
 
 	"github.com/PrimaShouji/captcha-verification/pkg/captchagen"
 )
@@ -16,28 +12,7 @@ type VerifyResult struct {
 	Result bool `json:"result"`
 }
 
-func intializeLogger() zerolog.Logger {
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
-	output.FormatLevel = func(i interface{}) string {
-		return strings.ToUpper(fmt.Sprintf("| %-6s|", i))
-	}
-	output.FormatMessage = func(i interface{}) string {
-		return fmt.Sprintf("%s |", i)
-	}
-	output.FormatFieldName = func(i interface{}) string {
-		return fmt.Sprintf("%s:", i)
-	}
-	output.FormatFieldValue = func(i interface{}) string {
-		return strings.ToUpper(fmt.Sprintf("%s", i))
-	}
-
-	return zerolog.New(output).With().Timestamp().Logger()
-}
-
 func main() {
-	// Initialize logger
-	log := intializeLogger()
-
 	// Initialize API
 	app := fiber.New()
 
@@ -45,11 +20,11 @@ func main() {
 		id := c.Params("id")
 		r, err := captchagen.Generate(id)
 		if err != nil {
-			log.Info().Str("id", id).Err(err).Msg("failed to generate CAPTCHA image")
+			log.Printf("Failed to generate CAPTCHA image for ID %s\n", id)
 			return c.SendStatus(500)
 		}
 
-		log.Info().Str("id", id).Msg("generated CAPTCHA image")
+		log.Printf("Generated CAPTCHA image for ID %s\n", id)
 
 		c.Context().SetContentType("image/png")
 		return c.SendStream(r)
@@ -61,7 +36,7 @@ func main() {
 
 		verified := captchagen.Verify(id, test)
 
-		log.Info().Str("id", id).Str("test", test).Bool("verified", verified).Msg("got verification request for CAPTCHA image")
+		log.Printf("Got verification request for CAPTCHA image for ID %s: %s - Result: %t\n", id, test, verified)
 
 		return c.JSON(&VerifyResult{
 			Result: verified,
@@ -69,6 +44,6 @@ func main() {
 	})
 
 	// Listen for requests
-	log.Info().Msg("application started")
+	log.Println("Application started")
 	app.Listen(":2539")
 }

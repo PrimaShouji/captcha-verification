@@ -5,7 +5,6 @@ go 1.17
 require (
 	github.com/dchest/captcha v0.0.0-20200903113550-03f5f0333e1f
 	github.com/gofiber/fiber/v2 v2.23.0
-	github.com/rs/zerolog v1.26.1
 )
 
 require (
