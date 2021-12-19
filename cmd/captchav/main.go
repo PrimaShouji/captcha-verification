@@ -20,7 +20,7 @@ func main() {
 		id := c.Params("id")
 		r, err := captchagen.Generate(id)
 		if err != nil {
-			log.Printf("Failed to generate CAPTCHA image for ID %s\n", id)
+			log.Printf("Failed to generate CAPTCHA image for ID %s: %v\n", id, err)
 			return c.SendStatus(500)
 		}
 
